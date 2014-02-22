@@ -1137,7 +1137,6 @@ public class MusicPlaybackService extends Service {
             }
             return mPlayPos;
         } else if (mShuffleMode == SHUFFLE_NORMAL) {
-
             if (mHistory.size() > MAX_HISTORY_SIZE) {
                 mHistory.remove(0);
             }
@@ -2087,7 +2086,6 @@ public class MusicPlaybackService extends Service {
                 }
                 return;
             }
-
             if (mPlayPos >= 0) {
                 mHistory.add(mPlayPos);
             }
