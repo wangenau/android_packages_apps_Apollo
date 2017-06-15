@@ -1399,6 +1399,10 @@ public class MusicPlaybackService extends Service {
                     .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, getAlbumName())
                     .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, getTrackName())
                     .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, duration())
+                    .putLong(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER,
+                            getQueuePosition() + 1)
+                    .putLong(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS, getQueue().length)
+                    .putString(MediaMetadataRetriever.METADATA_KEY_GENRE, getGenreName())
                     .putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK, albumArt)
                     .apply();
 
@@ -1784,6 +1788,35 @@ public class MusicPlaybackService extends Service {
                 return null;
             }
             return mCursor.getString(mCursor.getColumnIndexOrThrow(AudioColumns.ARTIST));
+        }
+    }
+
+    /**
+     * Returns the genre name of song
+     *
+     * @return The current song genre name
+     */
+    public String getGenreName() {
+        synchronized (this) {
+            if (mCursor == null) {
+                return null;
+            }
+            String[] genreProjection = { MediaStore.Audio.Genres.NAME };
+            Uri genreUri = MediaStore.Audio.Genres.getContentUriForAudioId("external",
+                   (int) mPlayList[mPlayPos]);
+            Cursor genreCursor = getContentResolver().query(genreUri, genreProjection,
+                   null, null, null);
+            if (genreCursor != null) {
+                try {
+                    if (genreCursor.moveToFirst()) {
+                        return genreCursor.getString(
+                            genreCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME));
+                    }
+                } finally {
+                    genreCursor.close();
+                }
+            }
+            return null;
         }
     }
 
